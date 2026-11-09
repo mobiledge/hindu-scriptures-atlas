@@ -342,7 +342,7 @@ function visibleRows(){
 function render(){
   const g=$("#gantt");NAMEW=g.clientWidth<640?170:280;TW=Math.max(g.clientWidth-NAMEW-2,640);
   const rows=visibleRows(),rel=related(state.sel),total=NAMEW+TW;
-  let h=`<div class="g-head" style="width:${total}px"><div class="g-corner" style="width:${NAMEW}px">Text</div><div class="g-axis" id="axis" style="width:${TW}px">${TICKS.map(t=>`<span class="tick" style="left:${X(t)}px">${t<0?-t+" BCE":t===0?"1 CE":t}</span>`).join("")}</div></div>`;
+  let h=`<div class="g-head" style="width:${total}px"><div class="g-corner" style="width:${NAMEW}px">Text</div><div class="g-axis" id="axis" style="width:${TW}px">${TICKS.map(t=>`<span class="tick" style="left:${X(t)}px${t===TICKS[0]?";transform:none;margin-left:-4px":""}">${t<0?-t+" BCE":t===0?"1 CE":t}</span>`).join("")}</div></div>`;
   h+=`<div style="position:absolute;top:32px;bottom:0;left:${NAMEW}px;width:${TW}px;pointer-events:none">${TICKS.map(t=>`<div class="grid-l" style="left:${X(t)}px"></div>`).join("")}<div class="cursor" id="cur" hidden></div></div>`;
   h+=`<div class="cursor-lbl" id="curl" hidden></div>`;
   let texts=0;
