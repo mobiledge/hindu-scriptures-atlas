@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hindu Scriptures Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+/* Layout: Gantt outline (sticky name column + time track) with a sticky detail sidebar on wide screens; detail stacks above on narrow */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --ink:#18202E; --muted:#5B6578; --line:#D9DEE7; --grid:#E9ECF2; --hover:#F1F4F9;
+  --accent:#2D4A7A; --sel:#FBEBD2; --sel-fg:#6A3F08;
+  --t-bg:#FBEBD2; --t-fg:#6A3F08; --i-bg:#DDF2EA; --i-fg:#0A5340;
+  --c-s:#3B5BA5; --c-m:#B26B12; --c-d:#23806C; --c-b:#A8456B;
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
+  --f-body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11151C; --surface:#1A1F29; --ink:#E6EAF2; --muted:#98A2B5; --line:#2C3340; --grid:#232935; --hover:#20262F; --accent:#9DB8E8;
+  --sel:#4E3410; --sel-fg:#FBE6C4; --t-bg:#4E3410; --t-fg:#FBE6C4; --i-bg:#0F4436; --i-fg:#CFF0E4;
+  --c-s:#8FA8E6; --c-m:#E0A85A; --c-d:#62C0A8; --c-b:#E58BAE; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11151C; --surface:#1A1F29; --ink:#E6EAF2; --muted:#98A2B5; --line:#2C3340; --grid:#232935; --hover:#20262F; --accent:#9DB8E8;
+  --sel:#4E3410; --sel-fg:#FBE6C4; --t-bg:#4E3410; --t-fg:#FBE6C4; --i-bg:#0F4436; --i-fg:#CFF0E4;
+  --c-s:#8FA8E6; --c-m:#E0A85A; --c-d:#62C0A8; --c-b:#E58BAE; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1480px;margin:0 auto}
+header{padding-block:36px 18px;display:grid;gap:10px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,4.5vw,48px);line-height:1.05;margin:0;text-wrap:balance}
+.lede{max-width:72ch;color:var(--muted);margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);align-items:center}
+.lg{display:inline-flex;gap:6px;align-items:center}
+.sw{width:12px;height:12px;border-radius:3px;flex:none;display:inline-block}
+.sw.s{background:var(--c-s)} .sw.m{background:var(--c-m)} .sw.d{background:var(--c-d)} .sw.b{background:var(--c-b)}
+.sw.out{background:transparent;border:2px solid var(--muted)}
+.sw.out.s{border-color:var(--c-s)} .sw.out.m{border-color:var(--c-m)} .sw.out.d{border-color:var(--c-d)} .sw.out.b{border-color:var(--c-b)}
+.lg .strip{width:34px;height:12px;position:relative;display:inline-block}
+.lg .strip::before{content:"";position:absolute;left:0;right:0;top:5px;height:2px;background:var(--muted);opacity:.5}
+.lg .strip i{position:absolute;top:2px;width:8px;height:8px;border-radius:50%;background:var(--muted)}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
+.main{min-width:0;display:grid;gap:10px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search{flex:1 1 220px;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0 10px}
+.search input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;padding:8px 0;outline:none}
+.search:focus-within{border-color:var(--accent)}
+.clear{border:0;background:none;color:var(--muted);font:inherit;cursor:pointer;padding:4px}
+.btn{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:5px 12px;cursor:pointer}
+.btn:hover{color:var(--ink);border-color:var(--ink)}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* gantt */
+.gantt{background:var(--surface);border:1px solid var(--line);border-radius:12px;height:min(78vh,860px);overflow:auto;position:relative;overscroll-behavior:contain}
+.g-inner{position:relative}
+.g-head{position:sticky;top:0;z-index:4;display:flex;height:32px;background:var(--surface);border-bottom:1px solid var(--line)}
+.g-corner{position:sticky;left:0;z-index:5;background:var(--surface);border-right:1px solid var(--line);flex:none;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;padding-left:12px}
+.g-axis{position:relative;flex:none}
+.tick{position:absolute;top:9px;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);transform:translateX(-50%);white-space:nowrap;font-variant-numeric:tabular-nums}
+.grid-l{position:absolute;top:0;bottom:0;width:1px;background:var(--grid);pointer-events:none}
+.era-band{position:absolute;top:0;bottom:0;pointer-events:none;background:var(--grid);opacity:.35}
+.cursor{position:absolute;top:0;bottom:0;width:1px;background:var(--accent);pointer-events:none;z-index:3;opacity:.7}
+.cursor-lbl{position:absolute;top:6px;z-index:6;font-family:var(--f-mono);font-size:11px;background:var(--accent);color:var(--surface);padding:1px 6px;border-radius:4px;transform:translateX(-50%);pointer-events:none;white-space:nowrap}
+.row{display:flex;height:30px;position:relative}
+.row:hover .name,.row:hover .track{background-color:var(--hover)}
+.name{position:sticky;left:0;z-index:2;flex:none;background:var(--surface);border-right:1px solid var(--line);display:flex;align-items:center;gap:6px;padding-right:8px;min-width:0;cursor:pointer}
+.name .car{border:0;background:none;color:var(--muted);font:inherit;font-size:11px;width:18px;height:22px;flex:none;cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:4px}
+.name .car span{display:inline-block;transition:transform .15s}
+.name .car[aria-expanded="true"] span{transform:rotate(90deg)}
+.name .car:hover{color:var(--ink);background:var(--grid)}
+.name .car.none{visibility:hidden}
+.name .ttl{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;border:0;background:none;color:inherit;font-family:inherit;text-align:left;padding:0;cursor:pointer}
+.name .rk{font-family:var(--f-mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;flex:none}
+.name .kc{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);flex:none;font-variant-numeric:tabular-nums}
+.row.grp .ttl{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.row.grp.top .ttl{color:var(--ink);font-size:12px}
+.row.grp.top{border-top:1px solid var(--line)}
+.track{position:relative;flex:none}
+.bar{position:absolute;top:10px;height:10px;border-radius:5px;cursor:pointer}
+.bar.s{background:var(--c-s)} .bar.m{background:var(--c-m)} .bar.d{background:var(--c-d)} .bar.b{background:var(--c-b)}
+.bar.out{background:transparent!important;border:2px solid}
+.bar.out.s{border-color:var(--c-s)} .bar.out.m{border-color:var(--c-m)} .bar.out.d{border-color:var(--c-d)} .bar.out.b{border-color:var(--c-b)}
+.stem{position:absolute;top:14px;height:2px;background:var(--muted);opacity:.35;pointer-events:none}
+.mk{position:absolute;top:11px;height:8px;min-width:8px;border-radius:4px;pointer-events:none;opacity:.9}
+.mk.s{background:var(--c-s)} .mk.m{background:var(--c-m)} .mk.d{background:var(--c-d)} .mk.b{background:var(--c-b)}
+.mk.out{background:var(--surface)!important;border:2px solid}
+.mk.out.s{border-color:var(--c-s)} .mk.out.m{border-color:var(--c-m)} .mk.out.d{border-color:var(--c-d)} .mk.out.b{border-color:var(--c-b)}
+.dl{position:absolute;top:8px;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+.row.sel .name,.row.sel .track{background-color:var(--sel)}
+.row.sel .ttl{color:var(--sel-fg);font-weight:700}
+.row.sel .dl{color:var(--sel-fg)}
+.row.rel .ttl{font-weight:700}
+.row.fade .bar,.row.fade .mk,.row.fade .stem{opacity:.3}
+.row.now .ttl{color:var(--accent)}
+.row.now .bar{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+mark{background:var(--t-bg);color:inherit;border-radius:2px}
+.car:focus-visible,.ttl:focus-visible,.btn:focus-visible,.link:focus-visible,.search input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.nores{padding:30px 16px;color:var(--muted)}
+
+/* detail */
+.detail{position:sticky;top:16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:10px;max-height:calc(100vh - 32px);overflow:auto}
+.crumb{font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.d-title{font-family:var(--f-display);font-size:25px;line-height:1.15;color:var(--ink);text-decoration:none;text-wrap:balance}
+.d-title:hover{text-decoration:underline;text-underline-offset:3px}
+.date{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.d-by{font-size:13.5px;color:var(--muted)}
+.d-desc{margin:0}
+.d-rels{display:grid;gap:6px;font-size:14px;border-top:1px solid var(--line);padding-top:10px}
+.d-rels b{display:block;font-weight:500;color:var(--muted);font-size:11px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.05em}
+.link{font:inherit;border:0;background:none;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-align:left}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:13px;line-height:1.3;border-radius:6px;padding:3px 7px;text-decoration:none;display:inline-block}
+.chip.t{background:var(--t-bg);color:var(--t-fg);font-style:italic}
+.chip.i{background:var(--i-bg);color:var(--i-fg)}
+.chip:hover{text-decoration:underline;text-underline-offset:2px}
+.hint{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin:0}
+footer{margin-top:28px;font-size:13px;color:var(--muted);max-width:80ch}
+@media (max-width:1100px){.layout{grid-template-columns:minmax(0,1fr)}.detail{position:static;max-height:none;order:-1}}
+@media (prefers-reduced-motion:reduce){.name .car span{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">c. 1500 BCE → present · one row per text</div>
+  <h1>Hindu Scriptures Atlas</h1>
+  <p class="lede">Each row is a scripture, nested under the text it belongs to or comments on, with a bar showing when it was composed. Collapsed rows show a whole family on one line: the root text, then a mark for each part, commentary and retelling. Expand a family to see its members, select any text for details, and hover the timeline to read off a year.</p>
+  <div class="legend" aria-label="Legend">
+    <span class="lg"><span class="sw s"></span>Shruti</span>
+    <span class="lg"><span class="sw m"></span>Smriti</span>
+    <span class="lg"><span class="sw d"></span>Darshana</span>
+    <span class="lg"><span class="sw b"></span>Agama, Tantra &amp; bhakti</span>
+    <span class="lg"><span class="sw out"></span>Commentary, retelling or translation</span>
+    <span class="lg"><span class="strip"><i style="left:6px"></i><i style="left:22px"></i></span>Collapsed family</span>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="main">
+    <div class="tools">
+      <label class="search" for="q"><span aria-hidden="true" style="color:var(--muted)">⌕</span>
+        <input id="q" type="search" placeholder="Search a text, author or idea (try “Gita”, “Advaita”, “Tulsidas”)" autocomplete="off">
+        <button class="clear" id="clear" type="button" aria-label="Clear search" hidden>✕</button></label>
+      <button class="btn" id="fam" type="button">Families</button>
+      <button class="btn" id="all" type="button">Expand all</button>
+      <button class="btn" id="none" type="button">Collapse all</button>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="gantt" id="gantt"><div class="g-inner" id="gi"></div></div>
+  </div>
+  <aside class="detail" id="detail" aria-live="polite"></aside>
+</div>
+
+<footer>Dates are approximate scholarly ranges for the main period of composition, and many are contested. Time is compressed before 500 BCE and stretched through the crowded medieval centuries. Each text has one parent here; some, like the Adhyatma Ramayana, belong to several traditions at once. Tap a title in the detail panel to open it on Wikipedia.</footer>
+</div>
+
+<script>
+// Groups: G(id, label, parent). Texts: R(id, title, class, parent, relation, start, end, dateLabel, by, description, sections, ideas)
+// class: s Shruti, m Smriti, d Darshana, b Agama/Tantra/bhakti. relation: "" (belongs to group), part, comm, ret, rel, trans
+const N=[],G=(id,t,p)=>N.push({id,t,p,g:1}),R=(id,t,c,p,r,s,e,d,by,desc,sec=[],idea=[])=>N.push({id,t,c,p,r,s,e,d,by,desc,sec,idea});
+
+G("shruti","Shruti · revealed",null);
+R("rv","Rigveda","s","shruti","",-1500,-1200,"c. 1500–1200 BCE","Rishi families (Vasishtha, Vishvamitra and others)","1,028 hymns in ten books (mandalas) to Agni, Indra, Soma and other deities; the oldest layer of the canon.",["Nasadiya Sukta","Purusha Sukta","Gayatri Mantra"],["Rta (cosmic order)","Yajna (sacrifice)"]);
+R("aib","Aitareya Brahmana","s","rv","part",-900,-700,"c. 900–700 BCE","","Prose manual explaining how the Rigveda's hymns are used in the soma sacrifice.",[],["Ritual exegesis"]);
+R("aia","Aitareya Aranyaka","s","rv","part",-800,-600,"c. 800–600 BCE","","A 'forest book' that turns ritual into meditation and leads into the Aitareya Upanishad.",[],["Internalized ritual"]);
+R("aiu","Aitareya Upanishad","s","rv","part",-650,-500,"c. 6th c. BCE","","A short creation account ending in the statement that consciousness is Brahman.",[],["Prajnanam Brahma"]);
+R("kau","Kaushitaki Upanishad","s","rv","part",-600,-400,"c. 6th–5th c. BCE","","Dialogues on the soul's paths after death and breath as the self.",[],["Prana (breath)"]);
+R("vp","Vedartha Prakasha","s","rv","comm",1340,1387,"14th c.","Sayana","Sayana's running commentary on all four Vedas, still the standard traditional gloss.",[],["Vedic commentary"]);
+R("sv","Samaveda","s","shruti","",-1200,-1000,"c. 1200–1000 BCE","","About 1,875 verses, mostly drawn from the Rigveda, set to melodies for the singing priest.",["Kauthuma recension","Jaiminiya recension"],["Saman (sung chant)","Udgitha"]);
+R("chu","Chandogya Upanishad","s","sv","part",-700,-600,"c. 7th c. BCE","Uddalaka Aruni (trad.)","Eight chapters of teachings, including Uddalaka's lessons to his son Shvetaketu.",["Shvetaketu dialogue"],["Tat tvam asi","Om"]);
+R("ken","Kena Upanishad","s","sv","part",-500,-400,"c. 5th c. BCE","","Asks by whose power the mind and senses work, and answers: Brahman, which they cannot grasp.",[],["Brahman beyond the senses"]);
+R("yv","Yajurveda","s","shruti","",-1200,-800,"c. 1200–800 BCE","","Prose formulas recited by the priest who performs the actions of the sacrifice, in White and Black branches.",["Shukla Yajurveda","Krishna Yajurveda","Shri Rudram"],["Yajna (sacrifice)"]);
+R("shb","Shatapatha Brahmana","s","yv","part",-800,-600,"c. 800–600 BCE","Yajnavalkya (trad.)","The largest Brahmana, 100 chapters on ritual, myth and cosmology, including the flood of Manu.",[],["Prajapati","Ritual exegesis"]);
+R("bru","Brihadaranyaka Upanishad","s","yv","part",-750,-650,"c. 700 BCE","Yajnavalkya (trad.)","The longest and oldest Upanishad; Yajnavalkya debates at Janaka's court and teaches his wife Maitreyi.",["Maitreyi dialogue","Pavamana mantra"],["Atman = Brahman","Neti neti","Karma"]);
+R("tau","Taittiriya Upanishad","s","yv","part",-600,-500,"c. 6th c. BCE","","Teaches the self as five nested sheaths, the innermost being bliss.",["Bhrigu Valli","Ananda Valli"],["Five koshas (sheaths)"]);
+R("isu","Isha Upanishad","s","yv","part",-500,-400,"c. 5th c. BCE","","Eighteen verses opening with the claim that all this is pervaded by the Lord.",[],["Ishvara in all"]);
+R("kat","Katha Upanishad","s","yv","part",-450,-100,"c. 5th–1st c. BCE","","The boy Nachiketa questions Yama, god of death, about what survives death.",["Nachiketa and Yama"],["Chariot allegory","Shreyas and preyas"]);
+R("shv","Shvetashvatara Upanishad","s","yv","part",-400,-200,"c. 400–200 BCE","","Joins Upanishadic monism with devotion to a personal god, Rudra-Shiva, and early Samkhya-Yoga.",[],["Personal god (Rudra)"]);
+R("av","Atharvaveda","s","shruti","",-1000,-800,"c. 1000–800 BCE","","About 730 hymns of healing, protection, household rites and cosmic speculation.",["Prithvi Sukta"],["Healing charms"]);
+R("mun","Mundaka Upanishad","s","av","part",-400,-300,"c. 4th c. BCE","","Distinguishes lower knowledge (the Vedas and their sciences) from higher knowledge of the imperishable.",["Satyameva Jayate"],["Higher and lower knowledge","Two birds parable"]);
+R("pra","Prashna Upanishad","s","av","part",-300,-100,"c. 3rd–1st c. BCE","","Six students bring six questions to the sage Pippalada, on breath, sleep, Om and the self.",[],["Prana (breath)"]);
+R("man","Mandukya Upanishad","s","av","part",-100,200,"c. 1st c. BCE–2nd c. CE","","Twelve verses mapping the syllable Om onto waking, dream, deep sleep and the fourth state.",[],["Om and the four states","Turiya"]);
+R("mak","Mandukya Karika","d","man","comm",500,600,"c. 6th c.","Gaudapada","Verse commentary on the Mandukya and the earliest systematic text of Advaita.",[],["Ajativada (non-origination)"]);
+R("mu","Later Upanishads","s","shruti","",-100,1500,"c. 100 BCE–1500 CE","","About 95 further Upanishads on yoga, renunciation and sectarian devotion, attached to the Vedas by tradition.",["Yoga Upanishads","Sannyasa Upanishads"],["Renunciation"]);
+
+G("smriti","Smriti · remembered",null);
+G("itihasa","Itihasa (epics)","smriti");
+R("ram","Ramayana","m","itihasa","",-500,300,"c. 5th c. BCE–3rd c. CE","Valmiki (trad.)","About 24,000 verses in seven books on the life of Rama, the abduction of Sita and the war in Lanka.",["Bala Kanda","Sundara Kanda","Uttara Kanda"],["Rama as ideal king","Ramarajya","Dharma"]);
+R("yvs","Yoga Vasistha","m","ram","rel",1000,1400,"c. 10th–14th c.","Valmiki (attrib.)","Framed as the sage Vasishtha teaching the young Rama; an Advaita work of 29,000 verses.",[],["World as dream","Advaita (non-dualism)"]);
+R("kam","Kamba Ramayanam","m","ram","ret",1150,1200,"c. 12th c.","Kamban","The Tamil retelling, admired as a summit of Tamil poetry.",[],["Rama bhakti"]);
+R("rcm","Ramcharitmanas","m","ram","ret",1574,1577,"1574–1577","Tulsidas","The Awadhi retelling that made Rama devotion the heart of north Indian Hinduism.",["Sundar Kand"],["Rama bhakti","Ramlila"]);
+R("hc","Hanuman Chalisa","m","rcm","rel",1575,1620,"16th c.","Tulsidas (trad.)","Forty verses to Hanuman, among the most recited Hindu prayers.",[],["Hanuman devotion"]);
+R("mbh","Mahabharata","m","itihasa","",-400,400,"c. 4th c. BCE–4th c. CE","Vyasa (trad.)","About 100,000 verses in 18 books on the war between the Pandavas and Kauravas; the longest poem known.",["Bhishma Parva","Vidura Niti","Vishnu Sahasranama"],["Dharma","Kurukshetra War"]);
+R("bg","Bhagavad Gita","m","mbh","part",-250,-100,"c. 2nd c. BCE","Vyasa (trad.)","700 verses in 18 chapters in which Krishna counsels Arjuna on the battlefield.",["Karma Yoga","Jnana Yoga","Bhakti Yoga","Vishvarupa (cosmic form)"],["Nishkama karma","Svadharma","Bhakti"]);
+R("dny","Dnyaneshwari","b","bg","comm",1290,1290,"1290","Dnyaneshwar","A 9,000-verse Marathi commentary on the Gita, founding text of the Varkari tradition.",[],["Varkari bhakti"]);
+R("grh","Gita Rahasya","m","bg","comm",1915,1915,"1915","Bal Gangadhar Tilak","Written in Mandalay prison; reads the Gita as a call to action rather than renunciation.",[],["Karma yoga as activism"]);
+R("gai","Bhagavad Gita As It Is","m","bg","comm",1968,1968,"1968","A. C. Bhaktivedanta Swami Prabhupada","The ISKCON translation and commentary, the most widely distributed Gita in English.",[],["Krishna consciousness"]);
+R("hv","Harivamsha","m","mbh","part",0,300,"c. 1st–3rd c.","","The Mahabharata's appendix, telling the life of Krishna before the war.",[],["Krishna's childhood"]);
+
+G("purana","Puranas","smriti");
+R("vip","Vishnu Purana","m","purana","",300,500,"c. 4th–5th c.","Parashara (trad.)","About 7,000 verses; the most systematic of the Vaishnava Puranas.",["Dhruva","Prahlada"],["Dashavatara","Yuga"]);
+R("mkp","Markandeya Purana","m","purana","",250,550,"c. 3rd–6th c.","","One of the oldest Puranas, narrated by the sage Markandeya.",[],["Manvantara"]);
+R("dm","Devi Mahatmya","m","mkp","part",400,600,"c. 400–600","","700 verses on the Goddess's victories over demons, recited at Navaratri; the root text of Shaktism.",["Mahishasura Mardini episode"],["Shakti as supreme"]);
+R("bdp","Brahmanda Purana","m","purana","",400,1000,"c. 4th–10th c.","","A Mahapurana on the cosmic egg; later layers carry major devotional texts.",[],["Cosmology"]);
+R("adr","Adhyatma Ramayana","m","bdp","part",1350,1500,"c. 14th–15th c.","","The Rama story retold as Advaita teaching; Rama is Brahman and Sita his power.",[],["Rama as Brahman"]);
+R("lsn","Lalita Sahasranama","m","bdp","part",800,1100,"c. 8th–11th c.","","A thousand names of the Goddess Lalita, central to Shri Vidya worship.",[],["Shri Vidya"]);
+R("bhp","Bhagavata Purana","m","purana","",850,950,"c. 9th–10th c.","Vyasa (trad.)","About 18,000 verses in 12 books; Book 10 tells Krishna's life and became the core of Krishna bhakti.",["Rasa Lila","Uddhava Gita"],["Bhakti","Svayam Bhagavan"]);
+R("shp","Shiva Purana","m","purana","",1000,1400,"c. 10th–14th c.","","Myths, rites and theology of Shiva, including the origin of the linga.",[],["Lingam"]);
+
+G("dharma","Dharmashastra","smriti");
+R("ds","Dharmasutras","m","dharma","",-600,-200,"c. 600–200 BCE","Apastamba, Gautama, Baudhayana","Prose manuals on duty and law attached to Vedic schools.",[],["Dharma as law"]);
+R("ms","Manusmriti","m","dharma","",-200,300,"c. 2nd c. BCE–3rd c. CE","Manu (trad.)","2,684 verses on duties, law, caste and the stages of life; the most cited legal text.",[],["Varnashrama dharma","Ashrama (stage of life)"]);
+R("yjs","Yajnavalkya Smriti","m","dharma","",250,500,"c. 3rd–5th c.","","A concise, systematic law code, especially on legal procedure.",[],["Legal procedure"]);
+R("mit","Mitakshara","m","yjs","comm",1080,1120,"c. 1100","Vijnaneshvara","Commentary on the Yajnavalkya Smriti; governed Hindu inheritance law into the 20th century.",[],["Inheritance law"]);
+G("sastra","Vedangas & shastras","smriti");
+R("vdg","Vedangas","m","sastra","",-600,-200,"c. 6th–2nd c. BCE","Panini, Yaska and others","Six auxiliary sciences for preserving and using the Veda.",["Shiksha","Kalpa","Vyakarana","Nirukta","Chandas","Jyotisha"],["Six limbs of the Veda"]);
+R("nat","Natyashastra","m","sastra","",-200,200,"c. 200 BCE–200 CE","Bharata Muni (trad.)","A treatise on drama, dance and music, called the fifth Veda.",[],["Rasa"]);
+
+G("darshana","Darshana · schools",null);
+G("mim","Mimamsa","darshana");
+R("pms","Purva Mimamsa Sutras","d","mim","",-300,-100,"c. 3rd–2nd c. BCE","Jaimini","About 2,700 sutras on interpreting Vedic injunctions.",[],["Authority of the Veda"]);
+G("ved","Vedanta","darshana");
+R("bs","Brahma Sutras","d","ved","",-200,200,"c. 2nd c. BCE–2nd c. CE","Badarayana","555 terse aphorisms systematizing the Upanishads; with them and the Gita, one of the three foundations of Vedanta.",[],["Prasthanatrayi"]);
+R("bsb","Shankara's Brahma Sutra Bhashya","d","bs","comm",700,750,"c. 8th c.","Adi Shankara","The founding commentary of Advaita: Brahman alone is real and the self is Brahman.",["Upanishad bhashyas","Gita bhashya"],["Advaita (non-dualism)","Maya"]);
+R("ads","Advaitasiddhi","d","bsb","rel",1580,1620,"c. 1600","Madhusudana Sarasvati","A dialectical defense of Advaita against Dvaita critics.",[],["Advaita (non-dualism)"]);
+R("sbh","Sri Bhashya","d","bs","comm",1100,1120,"c. 1100","Ramanuja","Commentary arguing the world and souls are real modes of a personal God.",[],["Qualified non-dualism","Sharanagati (surrender)"]);
+R("mbb","Madhva's Brahma Sutra Bhashya","d","bs","comm",1260,1300,"c. 13th c.","Madhvacharya","Commentary holding God, souls and matter to be eternally distinct.",[],["Dvaita (dualism)"]);
+G("sam","Samkhya","darshana");
+R("sk","Samkhyakarika","d","sam","",350,450,"c. 350–450","Ishvarakrishna","72 verses, the oldest surviving Samkhya text.",[],["Purusha & prakriti","Three gunas"]);
+G("yog","Yoga","darshana");
+R("ys","Yoga Sutras","d","yog","",150,400,"c. 2nd–4th c.","Patanjali","196 sutras in four chapters on stilling the mind.",[],["Eight limbs of yoga","Kaivalya"]);
+R("hyp","Hatha Yoga Pradipika","d","yog","",1400,1500,"c. 15th c.","Svatmarama","The classic manual of postures, breath control and locks.",[],["Hatha yoga","Kundalini"]);
+G("nv","Nyaya & Vaisheshika","darshana");
+R("ns","Nyaya Sutras","d","nv","",-200,200,"c. 2nd c. BCE–2nd c. CE","Akshapada Gautama","Founding text of Indian logic and theory of knowledge.",[],["Pramanas (means of knowledge)"]);
+R("vs","Vaisheshika Sutras","d","nv","",-200,0,"c. 2nd c. BCE","Kanada","Classifies reality into categories and matter into atoms.",[],["Paramanu (atom)"]);
+
+G("bhakti","Agama, Tantra & bhakti",null);
+G("shaiva","Shaiva","bhakti");
+R("sa","Shaiva Agamas","b","shaiva","",400,900,"c. 5th–9th c.","","28 canonical scriptures on temple building, ritual and theology.",[],["Pati, pashu, pasha"]);
+R("tev","Tevaram","b","shaiva","",550,800,"c. 6th–8th c.","Appar, Sambandar, Sundarar","About 8,000 Tamil hymns to Shiva, still sung in Tamil temples.",[],["Nayanars"]);
+R("ss","Shiva Sutras","b","shaiva","",800,900,"c. 9th c.","Vasugupta","77 sutras said to be revealed on a rock in Kashmir; root of Kashmir Shaivism.",[],["Kashmir Shaivism"]);
+R("tl","Tantraloka","b","shaiva","",990,1015,"c. 1000","Abhinavagupta","An encyclopedic synthesis of Tantric ritual and philosophy.",[],["Pratyabhijna (recognition)"]);
+R("vac","Vachanas","b","shaiva","",1150,1200,"12th c.","Basavanna, Akka Mahadevi and others","Kannada prose-poems rejecting caste and temple ritual for direct devotion.",[],["Lingayatism"]);
+G("vaish","Vaishnava","bhakti");
+R("pr","Pancharatra Samhitas","b","vaish","",500,900,"c. 6th–9th c.","","Vaishnava Agamas on image worship and God's emanations.",[],["Vyuha emanations"]);
+R("dp","Divya Prabandham","b","vaish","",550,900,"c. 6th–9th c.","The Alvars; compiled by Nathamuni","4,000 Tamil verses by twelve poet-saints, including Andal, honored as the Tamil Veda.",["Tiruvaymoli","Tiruppavai"],["Alvars"]);
+R("gg","Gita Govinda","b","vaish","",1150,1200,"c. 12th c.","Jayadeva","Sanskrit lyric poem on the love of Radha and Krishna.",[],["Radha Krishna"]);
+R("mira","Mirabai's padas","b","vaish","",1500,1550,"16th c.","Mirabai","Songs of a Rajput princess who claimed Krishna as her husband.",[],["Krishnaism"]);
+R("brs","Bhakti Rasamrita Sindhu","b","vaish","",1541,1541,"1541","Rupa Goswami","Analyzes devotion through the aesthetics of rasa; key Gaudiya theology.",[],["Gaudiya Vaishnavism"]);
+R("cc","Chaitanya Charitamrita","b","vaish","",1585,1600,"c. 1590s","Krishnadasa Kaviraja","Bengali biography and theology of Chaitanya.",[],["Achintya bhedabheda"]);
+R("abh","Tukaram's Abhangas","b","vaish","",1630,1650,"17th c.","Tukaram","Marathi devotional songs to Vithoba, sung on the Pandharpur pilgrimage.",[],["Varkari bhakti"]);
+G("shakta","Shakta","bhakti");
+R("sl","Saundarya Lahari","b","shakta","",800,1300,"date uncertain","Adi Shankara (attrib.)","100 verses praising the Goddess's beauty and power, used in Shri Vidya worship.",[],["Shri Vidya"]);
+R("kt","Kularnava Tantra","b","shakta","",1000,1400,"c. 11th–14th c.","","A central Kaula Tantra on initiation, the guru and worship of the Goddess.",[],["Kaula (Hinduism)"]);
+
+G("modern","Modern movements & reception",null);
+R("sia","Sirr-i-Akbar","s","modern","trans",1657,1657,"1657","Dara Shikoh","Persian translation of 50 Upanishads; its Latin version first brought them to Europe.",[],["Upanishads reach Europe"]);
+R("sbe","Sacred Books of the East","s","modern","trans",1879,1910,"1879–1910","ed. Max Müller","50-volume English translation series including the Upanishads and law books.",[],["Indology"]);
+R("sp","Satyarth Prakash","d","modern","",1875,1875,"1875","Dayananda Saraswati","Founding text of the Arya Samaj, calling for a return to the Vedas alone.",[],["Arya Samaj"]);
+R("ry","Raja Yoga","d","modern","",1896,1896,"1896","Swami Vivekananda","Presents the Yoga Sutras to a Western audience.",[],["Practical Vedanta"]);
+R("wai","Who Am I? (Nan Yar?)","d","modern","",1902,1902,"c. 1902","Ramana Maharshi","Short answers on finding the self by asking who is asking.",[],["Self-enquiry"]);
+R("gsr","The Gospel of Sri Ramakrishna","d","modern","",1902,1932,"1902–1932","Mahendranath Gupta","Diary-based record of Ramakrishna's conversations.",[],["Harmony of religions"]);
+R("ld","The Life Divine","d","modern","",1939,1940,"1939–1940","Sri Aurobindo","Argues that evolution moves toward a divine life on earth.",[],["Integral yoga"]);
+
+const BY={};N.forEach(n=>BY[n.id]=n);
+const KIDS={};N.forEach(n=>{(KIDS[n.p||"_root"]=KIDS[n.p||"_root"]||[]).push(n)});
+const TEXTS=N.filter(n=>!n.g);
+const LANES=[["s","Shruti"],["m","Smriti"],["d","Darshana"],["b","Agama, Tantra & bhakti"]];
+const RL={part:["Part of","Contains"],comm:["Commentary on","Commentaries"],ret:["Retelling of","Retellings"],rel:["Related to","Related works"],trans:["Translation","Translations"]};
+const W={"Rta (cosmic order)":"Ṛta","Yajna (sacrifice)":"Yajna","Atman = Brahman":"Ātman (Hinduism)","Tat tvam asi":"Tat Tvam Asi","Five koshas (sheaths)":"Kosha","Ishvara in all":"Ishvara",
+"Shreyas and preyas":"Katha Upanishad","Personal god (Rudra)":"Shvetashvatara Upanishad","Two birds parable":"Mundaka Upanishad","Higher and lower knowledge":"Mundaka Upanishad","Om and the four states":"Mandukya Upanishad",
+"Saman (sung chant)":"Samaveda","Kauthuma recension":"Samaveda","Jaiminiya recension":"Samaveda","Shri Rudram":"Shri Rudram Chamakam","Healing charms":"Atharvaveda","Ritual exegesis":"Brahmana","Internalized ritual":"Aranyaka",
+"Prajnanam Brahma":"Mahāvākya","Prana (breath)":"Prana","Brahman beyond the senses":"Kena Upanishad","Maitreyi dialogue":"Maitreyi","Pavamana mantra":"Pavamana Mantra","Shvetaketu dialogue":"Shvetaketu","Bhrigu Valli":"Taittiriya Upanishad","Ananda Valli":"Taittiriya Upanishad","Nachiketa and Yama":"Nachiketa",
+"Later Upanishads":"Upanishads","Renunciation":"Sannyasa","Vedic commentary":"Sayana","Vedartha Prakasha":"Sayana","Ajativada (non-origination)":"Ajativada",
+"Rama as ideal king":"Rama","Ramarajya":"Ram Rajya","Kamba Ramayanam":"Ramavataram","Rama bhakti":"Rama","World as dream":"Yoga Vasistha","Advaita (non-dualism)":"Advaita Vedanta","Sundar Kand":"Sundara Kanda","Hanuman devotion":"Hanuman",
+"Vidura Niti":"Vidura","Karma Yoga":"Karma yoga","Jnana Yoga":"Jnana yoga","Bhakti Yoga":"Bhakti yoga","Vishvarupa (cosmic form)":"Vishvarupa","Nishkama karma":"Nishkama Karma",
+"Gita Rahasya":"Bal Gangadhar Tilak","Karma yoga as activism":"Bal Gangadhar Tilak","Bhagavad Gita As It Is":"Bhagavad-gītā As It Is","Krishna consciousness":"International Society for Krishna Consciousness","Harivamsha":"Harivamsa","Krishna's childhood":"Harivamsa",
+"Mahishasura Mardini episode":"Mahishasura","Shakti as supreme":"Shaktism","Cosmology":"Hindu cosmology","Rama as Brahman":"Adhyatma Ramayana","Shri Vidya":"Shri Vidya","Rasa Lila":"Rasa lila","Lingam":"Lingam",
+"Dharma as law":"Dharmaśāstra","Ashrama (stage of life)":"Ashrama (stage)","Legal procedure":"Yajnavalkya Smriti","Inheritance law":"Mitakshara","Vedangas":"Vedanga","Kalpa":"Kalpa (Vedanga)","Vyakarana":"Vyākaraṇa","Six limbs of the Veda":"Vedanga","Natyashastra":"Natya Shastra","Rasa":"Rasa (aesthetics)",
+"Authority of the Veda":"Mimamsa","Shankara's Brahma Sutra Bhashya":"Adi Shankara","Upanishad bhashyas":"Adi Shankara","Gita bhashya":"Adi Shankara","Maya":"Maya (religion)","Advaitasiddhi":"Madhusudana Sarasvati",
+"Qualified non-dualism":"Vishishtadvaita","Sharanagati (surrender)":"Sharanagati","Madhva's Brahma Sutra Bhashya":"Madhvacharya","Dvaita (dualism)":"Dvaita Vedanta","Purusha & prakriti":"Samkhya","Three gunas":"Guṇa",
+"Yoga Sutras":"Yoga Sutras of Patanjali","Eight limbs of yoga":"Ashtanga (eight limbs of yoga)","Pramanas (means of knowledge)":"Pramana","Vaisheshika Sutras":"Vaiśeṣika Sūtra","Paramanu (atom)":"Paramanu",
+"Shaiva Agamas":"Shaiva Siddhanta","Pati, pashu, pasha":"Shaiva Siddhanta","Shiva Sutras":"Shiva Sutras of Vasugupta","Tantraloka":"Tantrāloka","Pratyabhijna (recognition)":"Pratyabhijna","Vachanas":"Vachana sahitya",
+"Pancharatra Samhitas":"Pancharatra","Vyuha emanations":"Vyuha","Divya Prabandham":"Naalayira Divya Prabandham","Mirabai's padas":"Mirabai","Bhakti Rasamrita Sindhu":"Rupa Goswami","Achintya bhedabheda":"Achintya Bheda Abheda","Tukaram's Abhangas":"Abhanga","Varkari bhakti":"Warkari",
+"Upanishads reach Europe":"Sirr-i-Akbar","Indology":"Max Müller","Return to the Vedas":"Arya Samaj","Practical Vedanta":"Swami Vivekananda","Raja Yoga":"Raja Yoga (book)","Who Am I? (Nan Yar?)":"Nan Yar?","Self-enquiry":"Self-enquiry (Ramana Maharshi)","Harmony of religions":"Ramakrishna"};
+const wiki=l=>W[l]?"https://en.wikipedia.org/wiki/"+encodeURIComponent(W[l].replace(/ /g,"_")):"https://en.wikipedia.org/w/index.php?search="+encodeURIComponent(l.replace(/\s*\(.*?\)/,""));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const $=s=>document.querySelector(s);
+const isOut=n=>n.r==="comm"||n.r==="ret"||n.r==="trans";
+
+
+
+// ---------- state ----------
+const state={q:"",sel:"bg",open:new Set()};
+const isParent=id=>(KIDS[id]||[]).length>0;
+function familyDefault(){state.open=new Set(N.filter(n=>n.g).map(n=>n.id));}
+familyDefault();
+try{const s=JSON.parse(localStorage.getItem("hsa-open")||"null");if(Array.isArray(s))state.open=new Set(s);}catch(e){}
+crumbs(state.sel).forEach(c=>state.open.add(c.id));
+const saveOpen=()=>{try{localStorage.setItem("hsa-open",JSON.stringify([...state.open]))}catch(e){}};
+
+function descendants(id){const out=[];(function d(x){(KIDS[x]||[]).forEach(k=>{if(!k.g)out.push(k);d(k.id);})})(id);return out;}
+function related(id){const set=new Set([id]);let p=BY[id].p;while(p&&BY[p]&&!BY[p].g){set.add(p);p=BY[p].p;}descendants(id).forEach(k=>set.add(k.id));return set;}
+function crumbs(id){const out=[];let p=BY[id].p;while(p){out.unshift(BY[p]);p=BY[p].p;}return out;}
+const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+function hit(n){if(n.g)return false;const q=norm(state.q);return [n.t,n.by,n.desc,...n.sec,...n.idea].some(x=>x&&norm(x).includes(q));}
+function hl(s){const t=esc(s);if(!state.q)return t;const i=norm(s).indexOf(norm(state.q));if(i<0)return t;
+  return esc(s.slice(0,i))+"<mark>"+esc(s.slice(i,i+state.q.length))+"</mark>"+esc(s.slice(i+state.q.length));}
+
+// ---------- scale ----------
+const STOPS=[[-1500,0],[-500,.20],[500,.46],[1500,.80],[2030,1]];
+const TICKS=[-1500,-1000,-500,0,500,1000,1500,1800];
+let NAMEW=280,TW=800;
+const PAD=16;
+function X(y){const inner=TW-PAD*2;for(let i=1;i<STOPS.length;i++){const[a,fa]=STOPS[i-1],[b,fb]=STOPS[i];if(y<=b)return PAD+(fa+(fb-fa)*(y-a)/(b-a))*inner;}return PAD+inner;}
+function Y(x){const inner=TW-PAD*2,f=(x-PAD)/inner;for(let i=1;i<STOPS.length;i++){const[a,fa]=STOPS[i-1],[b,fb]=STOPS[i];if(f<=fb)return Math.round(a+(b-a)*(f-fa)/(fb-fa));}return 2030;}
+const yr=y=>y<0?`${-y} BCE`:y===0?"1 CE":`${y} CE`;
+const cv=document.createElement("canvas").getContext("2d");
+const tw=s=>{cv.font='10.5px "JetBrains Mono", monospace';return cv.measureText(s).width;};
+
+// ---------- rows ----------
+function visibleRows(){
+  const rows=[];let matchSet=null;
+  if(state.q){matchSet=new Set();N.forEach(n=>{if(hit(n)){let x=n;while(x){matchSet.add(x.id);x=BY[x.p];}}});}
+  (function walk(list,depth){for(const n of list){
+    if(matchSet&&!matchSet.has(n.id))continue;
+    const kids=KIDS[n.id]||[];
+    const open=state.q?kids.some(k=>matchSet.has(k.id)):state.open.has(n.id);
+    rows.push({n,depth,open,hasKids:kids.length>0});
+    if(open)walk(kids,depth+1);
+  }})(KIDS._root||[],0);
+  return rows;
+}
+function render(){
+  const g=$("#gantt");NAMEW=g.clientWidth<640?170:280;TW=Math.max(g.clientWidth-NAMEW-2,640);
+  const rows=visibleRows(),rel=related(state.sel),total=NAMEW+TW;
+  let h=`<div class="g-head" style="width:${total}px"><div class="g-corner" style="width:${NAMEW}px">Text</div><div class="g-axis" id="axis" style="width:${TW}px">${TICKS.map(t=>`<span class="tick" style="left:${X(t)}px">${t<0?-t+" BCE":t===0?"1 CE":t}</span>`).join("")}</div></div>`;
+  h+=`<div style="position:absolute;top:32px;bottom:0;left:${NAMEW}px;width:${TW}px;pointer-events:none">${TICKS.map(t=>`<div class="grid-l" style="left:${X(t)}px"></div>`).join("")}<div class="cursor" id="cur" hidden></div></div>`;
+  h+=`<div class="cursor-lbl" id="curl" hidden></div>`;
+  let texts=0;
+  for(const r of rows){const n=r.n;const indent=10+r.depth*16;
+    if(n.g){
+      const ds=descendants(n.id);
+      h+=`<div class="row grp${r.depth===0?" top":""}" style="width:${total}px"><div class="name" style="width:${NAMEW}px;padding-left:${indent}px" data-tog="${n.id}"><button class="car" type="button" aria-expanded="${r.open}" aria-label="${r.open?"Collapse":"Expand"} ${esc(n.t)}" data-tog="${n.id}"><span>▸</span></button><button class="ttl" type="button" data-tog="${n.id}">${esc(n.t)}</button><span class="kc">${ds.length}</span></div><div class="track" style="width:${TW}px">${r.open?"":strip(ds)}</div></div>`;
+      continue;}
+    texts++;
+    const out=n.r==="comm"||n.r==="ret"||n.r==="trans";
+    const ds=r.hasKids&&!r.open?descendants(n.id):[];
+    const x0=X(n.s),x1=Math.max(X(n.e),x0+6);
+    const all=[n,...ds],fx1=Math.max(...all.map(k=>Math.max(X(k.e),X(k.s)+6)));
+    const lab=n.d,lw=tw(lab);let lx=fx1+8;if(lx+lw>TW-4)lx=Math.max(4,x0-lw-8);
+    const cls=["row",n.id===state.sel?"sel":"",n.id!==state.sel&&rel.has(n.id)?"rel":"",rel.has(n.id)?"":"fade"].join(" ");
+    const rk=n.r==="comm"?"comm.":n.r==="ret"?"retelling":n.r==="trans"?"transl.":"";
+    h+=`<div class="${cls}" data-row="${n.id}" style="width:${total}px"><div class="name" style="width:${NAMEW}px;padding-left:${indent}px">`+
+      `<button class="car${r.hasKids?"":" none"}" type="button" ${r.hasKids?`aria-expanded="${r.open}" aria-label="${r.open?"Collapse":"Expand"} ${esc(n.t)}" data-tog="${n.id}"`:`tabindex="-1" aria-hidden="true"`}><span>▸</span></button>`+
+      `<span class="sw ${out?"out ":""}${n.c}" style="width:10px;height:10px"></span><button class="ttl" type="button" data-sel="${n.id}" title="${esc(n.t)}">${hl(n.t)}</button>${rk&&NAMEW>200?`<span class="rk">${rk}</span>`:""}${ds.length?`<span class="kc">+${ds.length}</span>`:""}</div>`+
+      `<div class="track" style="width:${TW}px">${ds.length?`<div class="stem" style="left:${x1}px;width:${Math.max(0,fx1-x1)}px"></div>`+strip(ds,true):""}<div class="bar ${out?"out ":""}${n.c}" data-sel="${n.id}" style="left:${x0}px;width:${x1-x0}px" title="${esc(n.t+" · "+n.d)}"></div><span class="dl" style="left:${lx}px">${esc(lab)}</span></div></div>`;
+  }
+  if(!rows.length)h+=`<div class="nores">No texts match “${esc(state.q)}”. Try a shorter word or another spelling.</div>`;
+  $("#gi").style.width=total+"px";$("#gi").innerHTML=h;
+  $("#count").textContent=state.q?`${N.filter(hit).length} match${N.filter(hit).length===1?"":"es"}`:`${TEXTS.length} texts`;
+  $("#clear").hidden=!state.q;
+}
+function strip(ds,skipStem){
+  if(!ds.length)return "";
+  const a=Math.min(...ds.map(k=>X(k.s))),b=Math.max(...ds.map(k=>Math.max(X(k.e),X(k.s)+8)));
+  return (skipStem?"":`<div class="stem" style="left:${a}px;width:${b-a}px"></div>`)+ds.map(k=>{const o=k.r==="comm"||k.r==="ret"||k.r==="trans";const x=X(k.s),w=Math.max(X(k.e)-x,8);
+    return `<span class="mk ${o?"out ":""}${k.c}" style="left:${x}px;width:${w}px" title="${esc(k.t)}"></span>`}).join("");
+}
+
+// ---------- detail ----------
+const RLx={part:["Part of","Contains"],comm:["Commentary on","Commentaries"],ret:["Retelling of","Retellings"],rel:["Related to","Related works"],trans:["Translation","Translations"]};
+function renderDetail(){
+  const n=BY[state.sel];const kids=(KIDS[n.id]||[]).filter(k=>!k.g);
+  const parentTxt=n.r&&BY[n.p]&&!BY[n.p].g?BY[n.p]:null;
+  const groups={};kids.forEach(k=>{const lab=(RLx[k.r]||["","Includes"])[1];(groups[lab]=groups[lab]||[]).push(k)});
+  const lnk=x=>`<button class="link" type="button" data-sel="${x.id}">${esc(x.t)}</button>`;
+  const out=n.r==="comm"||n.r==="ret"||n.r==="trans";
+  $("#detail").innerHTML=`<div class="crumb"><span class="sw ${out?"out ":""}${n.c}"></span>${crumbs(n.id).filter(c=>c.g).map(c=>esc(c.t)).join(" › ")}</div>
+  <a class="d-title" href="${wiki(n.t)}" target="_blank" rel="noopener" title="Open on Wikipedia">${esc(n.t)}</a>
+  <div class="date">${esc(n.d)}</div>
+  ${n.by?`<div class="d-by">${esc(n.by)}</div>`:""}
+  <p class="d-desc">${esc(n.desc)}</p>
+  ${n.sec.length||n.idea.length?`<div class="chips">${n.sec.map(s=>`<a class="chip t" href="${wiki(s)}" target="_blank" rel="noopener">${esc(s)}</a>`).join("")}${n.idea.map(s=>`<a class="chip i" href="${wiki(s)}" target="_blank" rel="noopener">${esc(s)}</a>`).join("")}</div>`:""}
+  ${parentTxt||kids.length?`<div class="d-rels">${parentTxt?`<div><b>${RLx[n.r][0]}</b>${lnk(parentTxt)}</div>`:""}${Object.entries(groups).map(([lab,ks])=>`<div><b>${lab}</b>${ks.map(lnk).join(", ")}</div>`).join("")}</div>`:""}
+  <p class="hint">Amber chips are well-known sections; green chips are key ideas. Both open on Wikipedia.</p>`;
+}
+
+// ---------- interaction ----------
+function select(id,scroll){
+  state.sel=id;crumbs(id).forEach(c=>state.open.add(c.id));
+  renderDetail();render();
+  if(scroll){const el=document.querySelector(`[data-row="${id}"]`);if(el){const g=$("#gantt"),r=el.getBoundingClientRect(),c=g.getBoundingClientRect();
+    if(r.top<c.top+40||r.bottom>c.bottom)g.scrollTop+=r.top-c.top-c.height/3;}}
+}
+function toggle(id){state.open.has(id)?state.open.delete(id):state.open.add(id);saveOpen();render();}
+$("#gi").addEventListener("click",e=>{
+  const t=e.target.closest("[data-tog]");if(t&&!state.q){toggle(t.dataset.tog);return;}
+  const s=e.target.closest("[data-sel]");if(s){select(s.dataset.sel,false);return;}
+  const row=e.target.closest("[data-row]");if(row)select(row.dataset.row,false);
+});
+$("#detail").addEventListener("click",e=>{const b=e.target.closest("[data-sel]");if(b)select(b.dataset.sel,true);});
+$("#q").addEventListener("input",e=>{state.q=e.target.value.trim();render();});
+$("#clear").addEventListener("click",()=>{$("#q").value="";state.q="";render();$("#q").focus();});
+$("#fam").addEventListener("click",()=>{familyDefault();saveOpen();render();});
+$("#all").addEventListener("click",()=>{state.open=new Set(N.filter(n=>KIDS[n.id]).map(n=>n.id));saveOpen();render();});
+$("#none").addEventListener("click",()=>{state.open=new Set(N.filter(n=>n.g&&!n.p).map(n=>n.id));saveOpen();render();});
+
+// year cursor: hover the time track to read a year and ring every visible text in progress
+let raf=0;
+$("#gantt").addEventListener("pointermove",e=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;
+  const g=$("#gantt"),gr=g.getBoundingClientRect();const x=e.clientX-gr.left+g.scrollLeft-NAMEW;
+  const cur=$("#cur"),lbl=$("#curl");if(!cur)return;
+  const onTrack=e.clientX-gr.left>NAMEW&&x>=PAD&&x<=TW-PAD;
+  if(!onTrack){cur.hidden=true;lbl.hidden=true;document.querySelectorAll(".row.now").forEach(r=>r.classList.remove("now"));return;}
+  const y=Y(x);cur.hidden=false;lbl.hidden=false;cur.style.left=x+"px";
+  lbl.style.left=(NAMEW+x)+"px";lbl.style.top=(g.scrollTop+6)+"px";lbl.textContent=yr(y);
+  document.querySelectorAll("[data-row]").forEach(r=>{const n=BY[r.dataset.row];r.classList.toggle("now",n.s-15<=y&&y<=n.e+15);});
+});});
+$("#gantt").addEventListener("pointerleave",()=>{const c=$("#cur"),l=$("#curl");if(c)c.hidden=true;if(l)l.hidden=true;document.querySelectorAll(".row.now").forEach(r=>r.classList.remove("now"));});
+
+renderDetail();render();
+requestAnimationFrame(()=>{const el=document.querySelector(`[data-row="${state.sel}"]`);if(el){const g=$("#gantt");g.scrollTop=Math.max(0,el.offsetTop-g.clientHeight/3);}});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);
+let rt,lastW=0;window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{const w=$("#gantt").clientWidth;if(w!==lastW){lastW=w;render();}},150);});
+</script>
+
+</body>
+</html>
