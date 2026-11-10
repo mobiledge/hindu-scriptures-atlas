@@ -1,5 +1,7 @@
 # Hindu Scriptures Atlas
 
+**Live site:** https://mobiledge.github.io/hindu-scriptures-atlas/
+
 An interactive, single-page atlas of 79 Hindu scriptures, from the Rigveda (c. 1500 BCE) to modern works.
 
 Each row is a text, nested under the scripture it belongs to or comments on, with a bar showing its approximate period of composition on a shared timeline. Collapsed rows show a whole family on one line: the root text plus a mark for each part, commentary and retelling.
